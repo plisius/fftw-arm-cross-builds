@@ -1,0 +1,28 @@
+name: FFTW ARMv7 Build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-armv7:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Make build script executable
+        run: chmod +x scripts/fftw_build_armv7a_soft_hard.sh
+
+      - name: Install cross-compile tools
+        run: sudo apt-get update && sudo apt-get install -y gcc-arm-linux-gnueabi g++-arm-linux-gnueabi gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf wget make
+
+      - name: Copy fftw_bench.c
+        run: cp fftw_bench.c scripts/
+
+      - name: Test HARD float build
+        run: echo "1" | scripts/fftw_build_armv7a_soft_hard.sh
+
+      - name: Test SOFT float build
+        run: echo "2" | scripts/fftw_build_armv7a_soft_hard.sh
