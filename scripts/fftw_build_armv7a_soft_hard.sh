@@ -117,3 +117,7 @@ ${TARGET_TRIPLET}-gcc "$BENCH_SOURCE" -o "$BINARY_NAME" \
     ${FFTW_LIB}/libfftw3f.a -lm ${CFLAGS} -static
 
 echo "✅ Готово: $(realpath "$BINARY_NAME")"
+
+mkdir -p bin
+mv "$BINARY_NAME" "bin/$BINARY_NAME"
+echo "Бинарник перемещён в bin/$BINARY_NAME"
