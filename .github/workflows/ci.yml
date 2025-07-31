@@ -1,4 +1,4 @@
-name: FFTW ARMv7 Build
+name: FFTW ARM Builds
 
 on:
   push:
@@ -14,7 +14,7 @@ jobs:
       - name: Make build scripts executable
         run: chmod +x scripts/*.sh
 
-      - name: Install cross-compile tools and QEMU
+      - name: Install cross-compile tools and QEMU for ARMv7
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -41,20 +41,69 @@ jobs:
 
       - name: Run ARMv7 hard float binary in QEMU
         run: |
-          qemu-arm -L /usr/arm-linux-gnueabihf bin/fftw_bench_armv7a_hard_float > bin/qemu_bench_hard.log 2>&1 || echo "QEMU returned error, but continuing"
+          qemu-arm -L /usr/arm-linux-gnueabihf bin/fftw_bench_armv7a_hard_float > bin/qemu_bench_armv7_hard.log 2>&1 || echo "QEMU returned error, but continuing"
 
       - name: Run ARMv7 soft float binary in QEMU
         run: |
-          qemu-arm -L /usr/arm-linux-gnueabi bin/fftw_bench_armv7a_soft_float > bin/qemu_bench_soft.log 2>&1 || echo "QEMU returned error, but continuing"
+          qemu-arm -L /usr/arm-linux-gnueabi bin/fftw_bench_armv7a_soft_float > bin/qemu_bench_armv7_soft.log 2>&1 || echo "QEMU returned error, but continuing"
 
-      - name: Upload build artifacts
+      - name: Upload ARMv7 binaries
         uses: actions/upload-artifact@v4
         with:
-          name: fftw-binaries
-          path: bin/fftw_bench_*
+          name: fftw-binaries-armv7
+          path: bin/fftw_bench_armv7a_*
 
-      - name: Upload QEMU logs
+      - name: Upload ARMv7 QEMU logs
         uses: actions/upload-artifact@v4
         with:
-          name: qemu-benchmark-logs
-          path: bin/qemu_bench_*.log
+          name: qemu-benchmark-logs-armv7
+          path: bin/qemu_bench_armv7_*.log
+
+  build-armv8:
+    runs-on: ubuntu-latest  # Используем x86_64 runner, так как сборка и эмуляция идут через кросс-компилятор и QEMU
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Make build scripts executable
+        run: chmod +x scripts/*.sh
+
+      - name: Install cross-compile tools and QEMU for ARMv8
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
+            wget make \
+            qemu-user qemu-user-static
+
+      - name: Copy fftw_bench.c to scripts
+        run: cp fftw_bench.c scripts/
+
+      - name: Build ARMv8 (hard float)
+        run: echo "1" | scripts/fftw_build_armv8a_soft_hard.sh
+
+      - name: Build ARMv8 (soft float)
+        run: echo "2" | scripts/fftw_build_armv8a_soft_hard.sh
+
+      - name: List files in bin
+        run: ls -la bin/
+
+      - name: Run ARMv8 hard float binary in QEMU
+        run: |
+          qemu-aarch64 -L /usr/aarch64-linux-gnu bin/fftw_bench_armv8a_hard_float > bin/qemu_bench_armv8_hard.log 2>&1 || echo "QEMU returned error, but continuing"
+
+      - name: Run ARMv8 soft float binary in QEMU
+        run: |
+          qemu-aarch64 -L /usr/aarch64-linux-gnu bin/fftw_bench_armv8a_soft_float > bin/qemu_bench_armv8_soft.log 2>&1 || echo "QEMU returned error, but continuing"
+
+      - name: Upload ARMv8 binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: fftw-binaries-armv8
+          path: bin/fftw_bench_armv8a_*
+
+      - name: Upload ARMv8 QEMU logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: qemu-benchmark-logs-armv8
+          path: bin/qemu_bench_armv8_*.log
