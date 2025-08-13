@@ -4,10 +4,12 @@ on:
   push:
   pull_request:
 
+env:
+  ITERATIONS: 1000   # здесь меняем количество итераций для всех запусков
+
 jobs:
   build-armv7:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -41,11 +43,13 @@ jobs:
 
       - name: Run ARMv7 hard float binary in QEMU
         run: |
-          qemu-arm -L /usr/arm-linux-gnueabihf bin/fftw_bench_armv7a_hard_float > bin/qemu_bench_armv7_hard.log 2>&1 || echo "QEMU returned error, but continuing"
+          qemu-arm -L /usr/arm-linux-gnueabihf bin/fftw_bench_armv7a_hard_float $ITERATIONS \
+            > bin/qemu_bench_armv7_hard.log 2>&1 || echo "QEMU returned error, but continuing"
 
       - name: Run ARMv7 soft float binary in QEMU
         run: |
-          qemu-arm -L /usr/arm-linux-gnueabi bin/fftw_bench_armv7a_soft_float > bin/qemu_bench_armv7_soft.log 2>&1 || echo "QEMU returned error, but continuing"
+          qemu-arm -L /usr/arm-linux-gnueabi bin/fftw_bench_armv7a_soft_float $ITERATIONS \
+            > bin/qemu_bench_armv7_soft.log 2>&1 || echo "QEMU returned error, but continuing"
 
       - name: Upload ARMv7 binaries
         uses: actions/upload-artifact@v4
@@ -61,7 +65,6 @@ jobs:
 
   build-armv8:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -91,11 +94,13 @@ jobs:
 
       - name: Run ARMv8 hard float binary in QEMU
         run: |
-          qemu-aarch64 -L /usr/aarch64-linux-gnu bin/fftw_bench_armv8a_hard_float > bin/qemu_bench_armv8_hard.log 2>&1 || echo "QEMU returned error, but continuing"
+          qemu-aarch64 -L /usr/aarch64-linux-gnu bin/fftw_bench_armv8a_hard_float $ITERATIONS \
+            > bin/qemu_bench_armv8_hard.log 2>&1 || echo "QEMU returned error, but continuing"
 
       - name: Run ARMv8 soft float binary in QEMU
         run: |
-          qemu-arm -L /usr/arm-linux-gnueabi bin/fftw_bench_armv8a_soft_float > bin/qemu_bench_armv8_soft.log 2>&1 || echo "QEMU returned error, but continuing"
+          qemu-arm -L /usr/arm-linux-gnueabi bin/fftw_bench_armv8a_soft_float $ITERATIONS \
+            > bin/qemu_bench_armv8_soft.log 2>&1 || echo "QEMU returned error, but continuing"
 
       - name: Upload ARMv8 binaries
         uses: actions/upload-artifact@v4
