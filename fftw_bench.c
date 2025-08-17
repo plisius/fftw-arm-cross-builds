@@ -21,21 +21,21 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // Генерация / загрузка wisdom-файла
-    if (!fftwf_import_wisdom_from_filename("wisdom")) {
-        printf("Calibrating FFTW...\n");
-        fftwf_complex *tmp_in = (fftwf_complex*) fftwf_malloc(MAX_SIZE * sizeof(fftwf_complex));
-        fftwf_complex *tmp_out = (fftwf_complex*) fftwf_malloc(MAX_SIZE * sizeof(fftwf_complex));
-        if (!tmp_in || !tmp_out) {
-            fprintf(stderr, "Ошибка выделения памяти для калибровки wisdom\n");
-            return 1;
-        }
-        fftwf_plan plan_calib = fftwf_plan_dft_1d(MAX_SIZE, tmp_in, tmp_out, FFTW_FORWARD, FFTW_MEASURE);
-        fftwf_export_wisdom_to_filename("wisdom");
-        fftwf_destroy_plan(plan_calib);
-        fftwf_free(tmp_in);
-        fftwf_free(tmp_out);
-    }
+    // // Генерация / загрузка wisdom-файла
+    // if (!fftwf_import_wisdom_from_filename("wisdom")) {
+    //     printf("Calibrating FFTW...\n");
+    //     fftwf_complex *tmp_in = (fftwf_complex*) fftwf_malloc(MAX_SIZE * sizeof(fftwf_complex));
+    //     fftwf_complex *tmp_out = (fftwf_complex*) fftwf_malloc(MAX_SIZE * sizeof(fftwf_complex));
+    //     if (!tmp_in || !tmp_out) {
+    //         fprintf(stderr, "Ошибка выделения памяти для калибровки wisdom\n");
+    //         return 1;
+    //     }
+    //     fftwf_plan plan_calib = fftwf_plan_dft_1d(MAX_SIZE, tmp_in, tmp_out, FFTW_FORWARD, FFTW_MEASURE);
+    //     fftwf_export_wisdom_to_filename("wisdom");
+    //     fftwf_destroy_plan(plan_calib);
+    //     fftwf_free(tmp_in);
+    //     fftwf_free(tmp_out);
+    // }
 
     for (int N = 16; N <= MAX_SIZE; N *= 2) {
         in = (fftwf_complex*) fftwf_malloc(N * sizeof(fftwf_complex));
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
             return 1;
         }
 
-        plan = fftwf_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_MEASURE);
+        plan = fftwf_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_EXHAUSTIVE);
 
         clock_gettime(CLOCK_MONOTONIC, &start);
         for (int i = 0; i < iterations; i++) {
