@@ -29,9 +29,6 @@ jobs:
       - name: Verify qemu-arm installation
         run: qemu-arm --version
 
-      - name: Copy fftw_bench.c to scripts
-        run: cp fftw_bench.c scripts/
-
       - name: Build ARMv7-A (hard float)
         run: echo "1" | scripts/fftw_build_armv7a_soft_hard.sh
 
@@ -79,9 +76,6 @@ jobs:
             gcc-arm-linux-gnueabi g++-arm-linux-gnueabi \
             wget make \
             qemu-user qemu-user-static
-
-      - name: Copy fftw_bench.c to scripts
-        run: cp fftw_bench.c scripts/
 
       - name: Build ARMv8 (hard float)
         run: echo "1" | scripts/fftw_build_armv8a_soft_hard.sh
